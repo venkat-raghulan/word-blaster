@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Breakout</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body>
+    <div id="top-banner">
+        <div class="header" id="game-name">Word Blaster</div>
+        <div class="header">High Score: 32 points</div>
+    </div>
+
+    <div id="score-lives">
+        <div id="lives">Lives</div>
+        <div id="score">Score</div>
+    </div>
+    <div id="main-game">
+        <div class="big-div">
+            <div class="instructions">Knock the letters off the bricks</div>
+
+            <canvas id="breakout" width="730" height="480" id="canvas">
+            </canvas>
+            <div class="spacebar">
+                Press SpaceBar to Continue
+            </div>
+        </div>
+        <div class="big-div">
+            <div>
+                Complete this word to score a bonus
+            </div>
+            <div id="letters">
+                <span class="letter" id="letter-one">A</span>
+                <span class="letter" id="letter-two">R</span>
+                <span class="letter" id="letter-three">R</span>
+                <span class="letter" id="letter-four">A</span>
+                <span class="letter" id="letter-five">Y</span>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <script src="javascripts/words.js"></script>
+    <script src="javascripts/breakout.js"></script>
+</body>
+
+</html>
