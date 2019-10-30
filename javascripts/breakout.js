@@ -9,6 +9,9 @@ if (!window.localStorage.getItem("highScore")) {
 } else {
   highScore = window.localStorage.getItem("highScore");
 }
+var animationRequestId;
+var maxScore = 90;
+var levelNo = 1;
 
 // canvas variables
 
@@ -40,6 +43,8 @@ var paddleX = (canvas.width - paddleWidth) / 2;
 var rightPressed = false;
 var leftPressed = false;
 var spacePressed = false;
+var pausedFlag = false;
+var levelUpFlag = false;
 
 //bricks
 
@@ -50,12 +55,21 @@ const brickHeight = 20;
 const brickPadding = 10;
 const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
-var pausedFlag = false;
-const bricks = [];
-for (let c = 0; c < brickColumnCount; c++) {
-  bricks[c] = [];
-  for (let r = 0; r < brickRowCount; r++) {
-    bricks[c][r] = { x: 0, y: 0, status: 1, letter: "", activateToken: false };
+var bricks;
+
+function createBricksArray() {
+  bricks = [];
+  for (let c = 0; c < brickColumnCount; c++) {
+    bricks[c] = [];
+    for (let r = 0; r < brickRowCount; r++) {
+      bricks[c][r] = {
+        x: 0,
+        y: 0,
+        status: 1,
+        letter: "",
+        activateToken: false
+      };
+    }
   }
 }
 
@@ -106,12 +120,33 @@ function keyDownHandler(e) {
     leftPressed = true;
   } else if (e.code == "Space") {
     spacePressed = true;
-    if (pausedFlag) {
-      pausedFlag = false;
-      document.querySelector(".overlay").classList.remove("active");
-      document.querySelector(".life-lost").classList.remove("active");
-    }
+    spacePressedifLevelUp();
+    spacePressedifPaused();
   }
+}
+
+function spacePressedifPaused() {
+  if (pausedFlag) {
+    pausedFlag = false;
+    document.querySelector(".overlay").classList.remove("active");
+    document.querySelector(".life-lost").classList.remove("active");
+    document.querySelector(".level-up").classList.remove("active");
+  }
+}
+function spacePressedifLevelUp() {
+  if (levelUpFlag) {
+    levelUp();
+    levelUpFlag = false;
+    levelNo++;
+  }
+}
+
+function levelUp() {
+  cancelAnimationFrame(animationRequestId);
+  dx = dx + levelNo * 1.25;
+  dy = dy + levelNo * 1.25;
+  maxScore = maxScore + 90;
+  start();
 }
 
 function keyUpHandler(e) {
@@ -130,17 +165,26 @@ function collisionDetection() {
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount; r++) {
       var b = bricks[c][r];
+
+      //if the brick is visible
       if (b.status == 1) {
         if (
+          //if the ball position and brick position coincide
           x > b.x &&
           x < b.x + brickWidth &&
           y > b.y &&
           y < b.y + brickHeight
         ) {
+          // change direction
           dy = -dy;
+          //hide the bricks
           b.status = 0;
+          //increase score
           score++;
-          if (score == brickRowCount * brickColumnCount) {
+          if (score == maxScore) {
+            levelUpFlag = true;
+            console.log(levelUpFlag);
+            levelUpOverlay();
             // alert("YOU WIN, CONGRATULATIONS!");
             // document.location.reload();
           }
@@ -213,9 +257,12 @@ function drawBricks() {
 // Ball control
 
 function moveBall() {
+  // ball hits top
   if (y + dy < ballRadius) {
     dy = -speedRate * dy;
-  } else if (y + dy > canvas.height - ballRadius) {
+  }
+  // ball hits bottom
+  else if (y + dy > canvas.height - ballRadius) {
     // change direction depending on where it hits the paddle
     if (x > paddleX && x <= paddleX + paddleWidth / 2) {
       if (dx > 0) {
@@ -227,43 +274,65 @@ function moveBall() {
         dx = -speedRate * dx;
       }
       dy = -dy;
-    } else {
+    }
+    // if the ball does not hit the paddle
+    else {
+      //if there are no lives
       if (!lives) {
-        if (score > highScore) {
-          highScore = score;
-          window.localStorage.setItem("highScore", JSON.stringify(highScore));
-        }
-
-        document.getElementById("score-span").innerHTML += `${score}`;
-        document.getElementById("high-score-span").innerHTML += `${highScore}`;
-        document.querySelector(".game-over").classList.add("active");
-
-        overlay.classList.add("active");
-
-        pausedFlag = true;
+        gameOverOverlay();
         if (spacePressed) {
           document.location.reload();
-          overlay.classList.remove("active");
         }
-      } else {
+      }
+      //if there are pending lives
+      else {
         lives--;
-        x = canvas.width / 2;
-        y = canvas.height - 30;
-        dx = 2;
-        dy = -2;
-        paddleX = (canvas.width - paddleWidth) / 2;
-        pausedFlag = true;
-        document.querySelector(".life-lost").classList.add("active");
-        document.getElementById("lives-span").innerHTML = `${lives}`;
-        overlay.classList.add("active");
+        resetBallPaddle();
+        lifeLostOverlay();
       }
     }
   }
-  if (x + dx < ballRadius || x + dx > canvas.width - ballRadius) {
+  //ball hits side walls
+  else if (x + dx < ballRadius || x + dx > canvas.width - ballRadius) {
     dx = -speedRate * dx;
   }
   x += dx;
   y += dy;
+}
+
+function resetBallPaddle() {
+  x = canvas.width / 2;
+  y = canvas.height - 30;
+  dx = 2;
+  dy = 2;
+  paddleX = (canvas.width - paddleWidth) / 2;
+  var rightPressed = false;
+  var leftPressed = false;
+}
+
+function lifeLostOverlay() {
+  document.querySelector(".life-lost").classList.add("active");
+  document.getElementById("lives-span").innerHTML = `${lives}`;
+  overlay.classList.add("active");
+  pausedFlag = true;
+}
+
+function gameOverOverlay() {
+  if (score > highScore) {
+    highScore = score;
+    window.localStorage.setItem("highScore", JSON.stringify(highScore));
+  }
+  document.getElementById("score-span").innerHTML = `${score}`;
+  document.getElementById("high-score-span").innerHTML = `${highScore}`;
+  document.querySelector(".game-over").classList.add("active");
+  overlay.classList.add("active");
+  pausedFlag = true;
+}
+
+function levelUpOverlay() {
+  document.querySelector(".level-up").classList.add("active");
+  overlay.classList.add("active");
+  pausedFlag = true;
 }
 
 // Paddle control
@@ -299,11 +368,19 @@ function draw() {
     movePaddle();
     bonus();
     console.log("drawing");
+    console.log(dx, dy);
+    console.log(animationRequestId);
   }
-  requestAnimationFrame(draw);
+  animationRequestId = requestAnimationFrame(draw);
 }
 
-populateWord(randomword);
-shuffle(lettersArray);
-draw();
-$highScore.innerHTML += highScore;
+start();
+$highScore.innerHTML = highScore;
+
+function start() {
+  createBricksArray();
+  resetBallPaddle();
+  populateWord(randomword);
+  shuffle(lettersArray);
+  animationRequestId = requestAnimationFrame(draw);
+}
