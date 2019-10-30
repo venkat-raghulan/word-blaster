@@ -10,7 +10,8 @@ var wordsArray = [
 ];
 
 var letterBoxes = document.querySelectorAll(".letter");
-var spacebar = document.querySelector(".spacebar");
+var $highScore = document.querySelector(".highscore");
+var overlay = document.querySelector(".overlay");
 
 var lettersArray = [];
 wordsArray.forEach(element => {
@@ -41,6 +42,3 @@ function populateWord(word) {
     letterBoxes[i].textContent = word[i];
   }
 }
-
-console.log(lettersArray);
-

@@ -10,25 +10,31 @@
 </head>
 
 <body>
+    <div class="overlay">
+        <div class="game-over">
+            <span>Game Over</span>
+            <span id="score-span">Your Score: </span>
+            <span id="high-score-span">High Score: </span>
+            <span>Press SpaceBar to Continue</span></div>
+        <div class="life-lost">
+            <span>Oops! You lost a life.</span>
+            <span>Lives remaining: <span id="lives-span"></span></span>
+            <span>Press SpaceBar to Continue</span>
+        </div>
+    </div>
+
+    </div>
+
     <div id="top-banner">
         <div class="header" id="game-name">Word Blaster</div>
-        <div class="header">High Score: 32 points</div>
+        <div class="header">High Score: <span class="highscore"></span></div>
     </div>
 
     <div id="score-lives">
         <div id="lives">Lives</div>
-        <div id="score">Score</div>
+        <div id="score">Score</i></div>
     </div>
     <div id="main-game">
-        <div class="big-div">
-            <div class="instructions">Knock the letters off the bricks</div>
-
-            <canvas id="breakout" width="730" height="480" id="canvas">
-            </canvas>
-            <div class="spacebar">
-                Press SpaceBar to Continue
-            </div>
-        </div>
         <div class="big-div">
             <div>
                 Complete this word to score a bonus
@@ -42,6 +48,12 @@
             </div>
         </div>
 
+        <div class="big-div">
+            <!-- <div class="instructions">Knock the letters off the bricks</div> -->
+
+            <canvas id="breakout" width="730" height="480" id="canvas">
+            </canvas>
+        </div>
     </div>
 
 

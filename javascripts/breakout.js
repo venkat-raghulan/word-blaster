@@ -3,6 +3,12 @@
 var scoreDiv = document.getElementById("score");
 var livesDiv = document.getElementById("lives");
 var bonusDone = false;
+var highScore;
+if (!window.localStorage.getItem("highScore")) {
+  highScore = "0";
+} else {
+  highScore = window.localStorage.getItem("highScore");
+}
 
 // canvas variables
 
@@ -14,7 +20,7 @@ var y = canvas.height - 30;
 //Game Mechanics
 
 var score = 0;
-var lives = 2;
+var lives = 1;
 
 // ball
 const ballRadius = 10;
@@ -72,7 +78,6 @@ function letterActive() {
   });
 }
 
-console.log(bricks);
 //
 
 //event listeners
@@ -100,10 +105,11 @@ function keyDownHandler(e) {
   } else if (e.key == "ArrowLeft") {
     leftPressed = true;
   } else if (e.code == "Space") {
+    spacePressed = true;
     if (pausedFlag) {
-      spacePressed = true;
       pausedFlag = false;
-      spacebar.classList.toggle("active");
+      document.querySelector(".overlay").classList.remove("active");
+      document.querySelector(".life-lost").classList.remove("active");
     }
   }
 }
@@ -113,7 +119,7 @@ function keyUpHandler(e) {
     rightPressed = false;
   } else if (e.key == "ArrowLeft") {
     leftPressed = false;
-  } else if (e.key == "Space") {
+  } else if (e.code == "Space") {
     spacePressed = false;
   }
 }
@@ -135,8 +141,8 @@ function collisionDetection() {
           b.status = 0;
           score++;
           if (score == brickRowCount * brickColumnCount) {
-            alert("YOU WIN, CONGRATULATIONS!");
-            document.location.reload();
+            // alert("YOU WIN, CONGRATULATIONS!");
+            // document.location.reload();
           }
         }
       }
@@ -150,27 +156,11 @@ function updateScore() {
   scoreDiv.innerHTML = "Your Score: " + score;
 }
 
-// // Draw the score
-
-// function drawScore() {
-//   ctx.font = "16px Montserrat";
-//   ctx.fillStyle = "#0095DD";
-//   ctx.fillText("Score: " + score, 8, 20);
-// }
-
 //update lives
 
 function updateLives() {
   livesDiv.innerHTML = "Lives: " + lives;
 }
-
-// // Draw lives
-
-// function drawLives() {
-//   ctx.font = "16px Montserrat";
-//   ctx.fillStyle = "#0095DD";
-//   ctx.fillText("Lives: " + lives, canvas.width - 65, 20);
-// }
 
 // Draw ball
 
@@ -239,8 +229,22 @@ function moveBall() {
       dy = -dy;
     } else {
       if (!lives) {
-        alert("GAME OVER");
-        document.location.reload();
+        if (score > highScore) {
+          highScore = score;
+          window.localStorage.setItem("highScore", JSON.stringify(highScore));
+        }
+
+        document.getElementById("score-span").innerHTML += `${score}`;
+        document.getElementById("high-score-span").innerHTML += `${highScore}`;
+        document.querySelector(".game-over").classList.add("active");
+
+        overlay.classList.add("active");
+
+        pausedFlag = true;
+        if (spacePressed) {
+          document.location.reload();
+          overlay.classList.remove("active");
+        }
       } else {
         lives--;
         x = canvas.width / 2;
@@ -249,7 +253,9 @@ function moveBall() {
         dy = -2;
         paddleX = (canvas.width - paddleWidth) / 2;
         pausedFlag = true;
-        spacebar.classList.toggle("active");
+        document.querySelector(".life-lost").classList.add("active");
+        document.getElementById("lives-span").innerHTML = `${lives}`;
+        overlay.classList.add("active");
       }
     }
   }
@@ -292,9 +298,12 @@ function draw() {
     moveBall();
     movePaddle();
     bonus();
+    console.log("drawing");
   }
   requestAnimationFrame(draw);
 }
+
 populateWord(randomword);
 shuffle(lettersArray);
 draw();
+$highScore.innerHTML += highScore;
