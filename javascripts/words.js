@@ -9,6 +9,17 @@ var wordsArray = [
   "MONGO"
 ];
 
+var wordsMeaning = {
+  ASCII: "American Standard Code for Information Interchange",
+  ARRAY: "A special type of object used for storing ordered collections",
+  SPLIT: "A method used on strings to split them using a delimiter",
+  MERGE: "The action of combining multiple objects into a single entity",
+  INDEX: "Indicates the position on ordered collections - array, string etc",
+  MKDIR: "Command to make directory in the terminal",
+  AXIOS: "HTTP client used to send async requests",
+  MONGO: "Mongo or MongoDB is a database that can store hu'mongo'us data"
+};
+
 var letterBoxes = document.querySelectorAll(".letter");
 var $highScore = document.querySelector(".highscore");
 var overlay = document.querySelector(".overlay");

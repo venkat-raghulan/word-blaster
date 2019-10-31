@@ -344,6 +344,14 @@ function gameOverOverlay() {
   }
 }
 
+function buildWord() {
+  var wordSelected = "";
+  letterBoxes.forEach(element => {
+    wordSelected += element.innerHTML;
+  });
+  return wordSelected;
+}
+
 function levelUpOverlay() {
   document.querySelector(".level-up").classList.add("active");
   overlay.classList.add("active");
