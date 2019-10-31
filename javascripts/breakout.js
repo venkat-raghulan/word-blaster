@@ -339,7 +339,7 @@ function gameOverOverlay() {
   if (score > highScore) {
     highScore = score;
     document.getElementById("game-over-span").innerHTML =
-      "Yay! You have got a new high score!";
+      "<b>Yay! You have got a new high score!</b><br>";
     window.localStorage.setItem("highScore", JSON.stringify(highScore));
   }
 }
