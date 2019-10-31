@@ -33,12 +33,12 @@ function shuffle(array) {
     array[j] = x;
   }
   return array;
+  console.log("shuffling array");
 }
-
-var randomword = wordsArray[getRandomInt(0, 8)];
 
 function populateWord(word) {
   for (let i = 0; i < 5; i++) {
     letterBoxes[i].textContent = word[i];
+    console.log("populating word");
   }
 }

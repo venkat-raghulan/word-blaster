@@ -73,6 +73,13 @@ function createBricksArray() {
   }
 }
 
+function resetLetters() {
+  letterBoxes.forEach(element => {
+    element.classList.remove("active");
+  });
+  bonusDone = false;
+}
+
 function letterActive() {
   letterBoxes.forEach(element => {
     for (let c = 0; c < brickColumnCount; c++) {
@@ -126,7 +133,9 @@ function keyDownHandler(e) {
 }
 
 function spacePressedifPaused() {
+  console.log("here before pause");
   if (pausedFlag) {
+    console.log("here");
     pausedFlag = false;
     document.querySelector(".overlay").classList.remove("active");
     document.querySelector(".life-lost").classList.remove("active");
@@ -134,7 +143,9 @@ function spacePressedifPaused() {
   }
 }
 function spacePressedifLevelUp() {
+  console.log("herelvl");
   if (levelUpFlag) {
+    console.log("here in if lvl");
     levelUp();
     levelUpFlag = false;
     levelNo++;
@@ -142,7 +153,8 @@ function spacePressedifLevelUp() {
 }
 
 function levelUp() {
-  cancelAnimationFrame(animationRequestId);
+  dx = 2;
+  dy = 2;
   dx = dx + levelNo * 1.25;
   dy = dy + levelNo * 1.25;
   maxScore = maxScore + 90;
@@ -282,6 +294,7 @@ function moveBall() {
         gameOverOverlay();
         if (spacePressed) {
           document.location.reload();
+          console.log("reloading");
         }
       }
       //if there are pending lives
@@ -303,8 +316,8 @@ function moveBall() {
 function resetBallPaddle() {
   x = canvas.width / 2;
   y = canvas.height - 30;
-  dx = 2;
-  dy = 2;
+  console.log("resetting ball paddle");
+
   paddleX = (canvas.width - paddleWidth) / 2;
   var rightPressed = false;
   var leftPressed = false;
@@ -318,15 +331,17 @@ function lifeLostOverlay() {
 }
 
 function gameOverOverlay() {
-  if (score > highScore) {
-    highScore = score;
-    window.localStorage.setItem("highScore", JSON.stringify(highScore));
-  }
   document.getElementById("score-span").innerHTML = `${score}`;
   document.getElementById("high-score-span").innerHTML = `${highScore}`;
   document.querySelector(".game-over").classList.add("active");
   overlay.classList.add("active");
   pausedFlag = true;
+  if (score > highScore) {
+    highScore = score;
+    document.getElementById("game-over-span").innerHTML =
+      "Yay! You have got a new high score!";
+    window.localStorage.setItem("highScore", JSON.stringify(highScore));
+  }
 }
 
 function levelUpOverlay() {
@@ -367,9 +382,11 @@ function draw() {
     moveBall();
     movePaddle();
     bonus();
-    console.log("drawing");
-    console.log(dx, dy);
-    console.log(animationRequestId);
+  }
+  if (levelUpFlag) {
+    stop();
+    console.log("canceling animation frame");
+    return;
   }
   animationRequestId = requestAnimationFrame(draw);
 }
@@ -380,7 +397,12 @@ $highScore.innerHTML = highScore;
 function start() {
   createBricksArray();
   resetBallPaddle();
-  populateWord(randomword);
+  resetLetters();
+  populateWord(wordsArray[getRandomInt(0, 8)]);
   shuffle(lettersArray);
   animationRequestId = requestAnimationFrame(draw);
+}
+
+function stop() {
+  cancelAnimationFrame(animationRequestId);
 }
